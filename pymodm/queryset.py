@@ -161,8 +161,7 @@ class QuerySet(object):
 
         """
         before_pipeline = []
-        raw_query = self.raw_query
-        if raw_query:
+        if raw_query := self.raw_query:
             before_pipeline.append({'$match': raw_query})
         if self._projection:
             before_pipeline.append({'$project': self._projection})
@@ -211,8 +210,7 @@ class QuerySet(object):
              Vacation(destination='GRAND CANYON', travel_method='CAR')]
 
         """
-        query = self._query
-        if query:
+        if query := self._query:
             return self._clone(
                 query={'$and': [raw_query, query]})
         return self._clone(query=raw_query)
@@ -551,14 +549,13 @@ class QuerySet(object):
     def __getitem__(self, key):
         clone = self._clone()
 
-        if isinstance(key, slice):
-            # PyMongo will later raise an Exception if the slice is invalid.
-            if key.start is not None:
-                clone._skip = key.start
-                if key.stop is not None:
-                    clone._limit = key.stop - key.start
-            elif key.stop is not None:
-                clone._limit = key.stop
-            return clone
-        else:
+        if not isinstance(key, slice):
             return clone.skip(key).first()
+        # PyMongo will later raise an Exception if the slice is invalid.
+        if key.start is not None:
+            clone._skip = key.start
+            if key.stop is not None:
+                clone._limit = key.stop - key.start
+        elif key.stop is not None:
+            clone._limit = key.stop
+        return clone

@@ -175,11 +175,11 @@ class TopLevelMongoModelMetaclass(MongoModelMetaclass):
         first_manager = None
         for name in cls.__dict__:
             attr = getattr(cls, name)
-            if isinstance(attr, Manager):
-                if first_manager is None:
-                    first_manager = attr
-                elif first_manager.creation_order > attr.creation_order:
-                    first_manager = attr
+            if isinstance(attr, Manager) and (
+                first_manager is None
+                or first_manager.creation_order > attr.creation_order
+            ):
+                first_manager = attr
         return first_manager
 
 
@@ -216,10 +216,9 @@ class MongoModelBase(object):
                 kwargs[next_field_name] = args[i]
 
         # Set values for specified fields
-        field_names = set(
-            field.attname for field in self._mongometa.get_fields())
+        field_names = {field.attname for field in self._mongometa.get_fields()}
         for field in kwargs:
-            if 'pk' == field:
+            if field == 'pk':
                 setattr(self, self._mongometa.pk.attname, kwargs[field])
             elif field not in field_names:
                 raise ValueError(
@@ -252,9 +251,9 @@ class MongoModelBase(object):
         }
         ignore_unknown = self._mongometa.ignore_unknown_fields
         for field in dict:
-            if '_cls' == field:
+            if field == '_cls':
                 continue
-            elif '_id' == field and not self._mongometa.implicit_id:
+            elif field == '_id' and not self._mongometa.implicit_id:
                 self._data.set_mongo_value(
                     self._mongometa.pk.attname, dict[field])
             elif field in field_names:
@@ -387,11 +386,11 @@ class MongoModelBase(object):
         return iter(self._data)
 
     def __str__(self):
-        return '<%s object>' % self.__class__.__name__
+        return f'<{self.__class__.__name__} object>'
 
     def __repr__(self):
         attrs = ('%s=%r' % (fname, getattr(self, fname)) for fname in self)
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(attrs))
+        return f"{self.__class__.__name__}({', '.join(attrs)})"
 
     def __eq__(self, other):
         if isinstance(other, MongoModelBase):
@@ -423,8 +422,7 @@ class TopLevelMongoModel(MongoModelBase):
     @pk.setter
     def pk(self, value):
         if self._mongometa.pk is None:
-            raise ValueError('No primary key set for %s'
-                             % self._mongometa.object_name)
+            raise ValueError(f'No primary key set for {self._mongometa.object_name}')
         setattr(self, self._mongometa.pk.attname, value)
 
     @property
@@ -620,10 +618,9 @@ class _LazyDecoder(object):
     def __eq__(self, other):
         if self._members != other._members:
             return False
-        for key in self:
-            if self._get_raw_value(key) != other._get_raw_value(key):
-                return False
-        return True
+        return all(
+            self._get_raw_value(key) == other._get_raw_value(key) for key in self
+        )
 
     def remove(self, key):
         self._mongo_data.pop(key, None)

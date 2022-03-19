@@ -69,7 +69,7 @@ class MongoBaseField(object):
 
     def _validate_mongo_name(self, mongo_name, attname=None):
         if not self.primary_key and mongo_name == '_id':
-            field_msg = ' of field %s' % (attname,) if attname else ''
+            field_msg = f' of field {attname}' if attname else ''
             raise ValueError(
                 'mongo_name%s is "_id", but primary_key is False.'
                 % (field_msg,))
@@ -234,8 +234,7 @@ class RelatedModelFieldsBase(MongoBaseField):
         if not (isinstance(model, string_types) or
                 (isinstance(model, type) and
                  issubclass(model, MongoModelBase))):
-            raise ValueError('model must be a Model class or a string, not %s'
-                             % model)
+            raise ValueError(f'model must be a Model class or a string, not {model}')
 
     @property
     def related_model(self):
@@ -263,8 +262,7 @@ class RelatedModelFieldsBase(MongoBaseField):
             return self.related_model.from_document(value).to_son()
 
         # we could not convert value to SON
-        raise ValidationError(
-            '%s is not a valid %s' % (value, self.related_model.__name__))
+        raise ValidationError(f'{value} is not a valid {self.related_model.__name__}')
 
 
 class RelatedEmbeddedModelFieldsBase(RelatedModelFieldsBase):

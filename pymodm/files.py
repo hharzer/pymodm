@@ -337,7 +337,7 @@ class GridFSFile(File):
             try:
                 self.file = self.gridfs.open_download_stream(self.file_id)
             except NoFile:
-                raise ValidationError('No file with id: %s' % self.file_id)
+                raise ValidationError(f'No file with id: {self.file_id}')
         return self._file
 
     @file.setter

@@ -39,9 +39,9 @@ VALID_MONGO_NAMES = ['', 'dollar$', 'forty-two']
 
 def connect_to_test_DB(alias=None):
     if alias is None:
-        connect('%s/%s' % (MONGO_URI, DB.name))
+        connect(f'{MONGO_URI}/{DB.name}')
     else:
-        connect('%s/%s' % (MONGO_URI, DB.name), alias=alias)
+        connect(f'{MONGO_URI}/{DB.name}', alias=alias)
 
 
 connect_to_test_DB()

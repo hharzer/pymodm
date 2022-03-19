@@ -62,6 +62,4 @@ class Post(MongoModel):
     @property
     def summary(self):
         """Return at most 100 characters of the body."""
-        if len(self.body) > 100:
-            return self.body[:97] + '...'
-        return self.body
+        return f'{self.body[:97]}...' if len(self.body) > 100 else self.body

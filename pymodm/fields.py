@@ -332,8 +332,7 @@ class EmailField(MongoBaseField):
 
         def validate_email(value):
             if not re.match(self.EMAIL_PATTERN, value):
-                raise ValidationError(
-                    '%s is not a valid email address.' % value)
+                raise ValidationError(f'{value} is not a valid email address.')
         self.validators.append(validate_email)
 
 
@@ -545,10 +544,10 @@ class URLField(MongoBaseField):
         def validate_url(url):
             scheme, rest = url.split('://')
             if scheme.lower() not in self.SCHEMES:
-                raise ValidationError('Unrecognized scheme: ' + scheme)
+                raise ValidationError(f'Unrecognized scheme: {scheme}')
             domain, _, path = rest.partition('/')
             if not re.match(self.PATH_PATTERN, path):
-                raise ValidationError('Invalid path: ' + path)
+                raise ValidationError(f'Invalid path: {path}')
             if not re.match(self.DOMAIN_PATTERN, domain):
                 # Maybe it's an ip address?
                 if not PY3 and isinstance(domain, str):
@@ -561,7 +560,7 @@ class URLField(MongoBaseField):
                         domain, port = domain.rsplit(':', 1)
                         ipaddress.ip_address(domain)
                     except ValueError:
-                        raise ValidationError('Invalid URL: ' + rest)
+                        raise ValidationError(f'Invalid URL: {rest}')
         self.validators.append(validate_url)
 
 
@@ -799,14 +798,10 @@ class ListField(MongoBaseField):
         self.validators.append(validate_items)
 
     def to_mongo(self, value):
-        if self._field:
-            return [self._field.to_mongo(v) for v in value]
-        return value
+        return [self._field.to_mongo(v) for v in value] if self._field else value
 
     def to_python(self, value):
-        if self._field:
-            return [self._field.to_python(v) for v in value]
-        return value
+        return [self._field.to_python(v) for v in value] if self._field else value
 
     def contribute_to_class(self, cls, name):
         super(ListField, self).contribute_to_class(cls, name)
@@ -1040,8 +1035,7 @@ class GeometryCollectionField(MongoBaseField):
             field_class = cls._geo_field_classes.get(geometry_type)
             try:
                 if field_class is None:
-                    raise ValidationError(
-                        'Invalid GeoJSON type: %s' % geometry_type)
+                    raise ValidationError(f'Invalid GeoJSON type: {geometry_type}')
                 else:
                     field_class.validate_geojson(geometry)
             except ValidationError as e:
@@ -1080,8 +1074,10 @@ class EmbeddedModelField(RelatedEmbeddedModelFieldsBase):
 
         def validate_related_model(value):
             if not isinstance(value, self.related_model):
-                raise ValidationError('value must be an instance of %s.'
-                                      % (self.related_model.__name__))
+                raise ValidationError(
+                    f'value must be an instance of {self.related_model.__name__}.'
+                )
+
             value.full_clean()
         self.validators.append(validate_related_model)
 

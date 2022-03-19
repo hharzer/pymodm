@@ -41,19 +41,15 @@ def logged_in(func):
 def create_post():
     if request.method == 'GET':
         return render_template('new_post.html')
-    else:
-        if request.form['date']:
-            post_date = request.form['date']
-        else:
-            post_date = datetime.datetime.now()
-        try:
-            Post(title=request.form['title'],
-                 date=post_date,
-                 body=request.form['content'],
-                 author=session['user']).save()
-        except ValidationError as exc:
-            return render_template('new_post.html', errors=exc.message)
-        return redirect(url_for('index'))
+    post_date = request.form['date'] or datetime.datetime.now()
+    try:
+        Post(title=request.form['title'],
+             date=post_date,
+             body=request.form['content'],
+             author=session['user']).save()
+    except ValidationError as exc:
+        return render_template('new_post.html', errors=exc.message)
+    return redirect(url_for('index'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -61,19 +57,18 @@ def login():
     if request.method == 'GET':
         # Return login form.
         return render_template('login.html')
+    # Login.
+    email, password = request.form['email'], request.form['password']
+    try:
+        # Note: logging users in like this is acceptable for demonstration
+        # projects only.
+        user = User.objects.get({'_id': email, 'password': password})
+    except User.DoesNotExist:
+        return render_template('login.html', error='Bad email or password')
     else:
-        # Login.
-        email, password = request.form['email'], request.form['password']
-        try:
-            # Note: logging users in like this is acceptable for demonstration
-            # projects only.
-            user = User.objects.get({'_id': email, 'password': password})
-        except User.DoesNotExist:
-            return render_template('login.html', error='Bad email or password')
-        else:
-            # Store user in the session.
-            session['user'] = user.email
-            return redirect(url_for('index'))
+        # Store user in the session.
+        session['user'] = user.email
+        return redirect(url_for('index'))
 
 
 @app.route('/logout')
@@ -87,24 +82,23 @@ def logout():
 def new_user():
     if request.method == 'GET':
         return render_template('new_user.html')
-    else:
-        try:
-            # Note: real applications should handle user registration more
-            # securely than this.
-            User(email=request.form['email'],
-                 handle=request.form['handle'],
-                 # Use `force_insert` so that we get a DuplicateKeyError if
-                 # another user already exists with the same email address.
-                 # Without this option, we will update (replace) the user with
-                 # the same id (email).
-                 password=request.form['password']).save(force_insert=True)
-        except ValidationError as ve:
-            return render_template('new_user.html', errors=ve.message)
-        except DuplicateKeyError:
-            # Email address must be unique.
-            return render_template('new_user.html', errors={
-                'email': 'There is already a user with that email address.'
-            })
+    try:
+        # Note: real applications should handle user registration more
+        # securely than this.
+        User(email=request.form['email'],
+             handle=request.form['handle'],
+             # Use `force_insert` so that we get a DuplicateKeyError if
+             # another user already exists with the same email address.
+             # Without this option, we will update (replace) the user with
+             # the same id (email).
+             password=request.form['password']).save(force_insert=True)
+    except ValidationError as ve:
+        return render_template('new_user.html', errors=ve.message)
+    except DuplicateKeyError:
+        # Email address must be unique.
+        return render_template('new_user.html', errors={
+            'email': 'There is already a user with that email address.'
+        })
     return redirect(url_for('index'))
 
 
@@ -130,7 +124,7 @@ def new_comment():
     try:
         post = Post.objects.get({'_id': post_id})
     except Post.DoesNotExist:
-        flash('No post with id: %s' % post_id)
+        flash(f'No post with id: {post_id}')
         return redirect(url_for('index'))
     comment = Comment(
         author=request.form['author'],

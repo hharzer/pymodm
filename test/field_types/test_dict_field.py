@@ -32,8 +32,8 @@ class DictFieldTestCase(FieldTestCase):
         with self.assertRaisesRegex(ValidationError, msg):
             self.field.validate({42: 'forty-two'})
 
+        msg = "Dictionary keys cannot .*"
         for invalid_mongo_name in INVALID_MONGO_NAMES:
-            msg = "Dictionary keys cannot .*"
             with self.assertRaisesRegex(ValidationError, msg):
                 self.field.validate({invalid_mongo_name: 42})
             # Invalid name in a sub dict.
