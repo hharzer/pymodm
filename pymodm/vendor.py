@@ -47,27 +47,27 @@ def parse_datetime(string):
 
     Return the parsed datetime, or ``None`` if unsuccessful.
     """
-    match = re.match(DATETIME_PATTERN, string)
-    if match:
-        time_parts = match.groupdict()
-        if time_parts['microsecond'] is not None:
-            time_parts['microsecond'] = (
-                time_parts['microsecond'].ljust(6, '0'))
-        tzinfo = time_parts.pop('tzinfo')
-        if 'Z' == tzinfo:
-            tzinfo = utc
-        elif tzinfo is not None:
-            offset_hours = int(tzinfo[1:3])
-            offset_minutes = int(tzinfo[4:]) if len(tzinfo) > 3 else 0
-            offset_total = offset_hours * 60 + offset_minutes
-            sign = '+'
-            if '-' == tzinfo[0]:
-                offset_total *= -1
-                sign = '-'
-            offset_name = '%s%02d:%02d' % (
-                sign, offset_hours, offset_minutes)
-            tzinfo = FixedOffset(offset_total, offset_name)
-        time_parts = {k: int(time_parts[k]) for k in time_parts
-                      if time_parts[k] is not None}
-        time_parts['tzinfo'] = tzinfo
-        return datetime.datetime(**time_parts)
+    if not (match := re.match(DATETIME_PATTERN, string)):
+        return
+    time_parts = match.groupdict()
+    if time_parts['microsecond'] is not None:
+        time_parts['microsecond'] = (
+            time_parts['microsecond'].ljust(6, '0'))
+    tzinfo = time_parts.pop('tzinfo')
+    if tzinfo == 'Z':
+        tzinfo = utc
+    elif tzinfo is not None:
+        offset_hours = int(tzinfo[1:3])
+        offset_minutes = int(tzinfo[4:]) if len(tzinfo) > 3 else 0
+        offset_total = offset_hours * 60 + offset_minutes
+        sign = '+'
+        if tzinfo[0] == '-':
+            offset_total *= -1
+            sign = '-'
+        offset_name = '%s%02d:%02d' % (
+            sign, offset_hours, offset_minutes)
+        tzinfo = FixedOffset(offset_total, offset_name)
+    time_parts = {k: int(time_parts[k]) for k in time_parts
+                  if time_parts[k] is not None}
+    time_parts['tzinfo'] = tzinfo
+    return datetime.datetime(**time_parts)

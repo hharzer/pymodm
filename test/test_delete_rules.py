@@ -107,7 +107,7 @@ class DeleteRulesTestCase(ODMTestCase):
             reffed.delete()
 
     def _pull_test(self, referencing_model):
-        refs = [ReferencedModel().save() for i in range(3)]
+        refs = [ReferencedModel().save() for _ in range(3)]
         multi_reffing = referencing_model(refs).save()
 
         refs[0].delete()

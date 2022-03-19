@@ -41,7 +41,7 @@ def validator_for_type(types, value_name=None):
                 type_names = tuple(t.__name__ for t in types)
                 err = 'must be one of %r' % (type_names,)
             else:
-                err = 'must be a %s' % types.__name__
+                err = f'must be a {types.__name__}'
             raise ValidationError(
                 '%s %s, not %r'
                 % (value_name or 'Value', err, value))
@@ -64,11 +64,9 @@ def validator_for_min_max(min, max):
     """Return a validator that validates its value against a minimum/maximum."""
     def validator(value):
         if min is not None and value < min:
-            raise ValidationError(
-                '%s is less than minimum value of %s.' % (value, min))
+            raise ValidationError(f'{value} is less than minimum value of {min}.')
         if max is not None and value > max:
-            raise ValidationError(
-                '%s is greater than maximum value of %s.' % (value, max))
+            raise ValidationError(f'{value} is greater than maximum value of {max}.')
     return validator
 
 

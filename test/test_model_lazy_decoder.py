@@ -71,7 +71,7 @@ class TestLazyDecoder(unittest.TestCase):
 
     def test_remove(self):
         def _generate_keyset(*iterables):
-            return set([k for k in iter(chain(*iterables))])
+            return set(list(iter(chain(*iterables))))
 
         all_keys = _generate_keyset(MONGO_DATA, PYTHON_DATA)
         expected_keyset = copy.copy(all_keys)

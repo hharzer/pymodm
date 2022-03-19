@@ -53,7 +53,7 @@ def _import(full_name):
 
 
 def register_document(document):
-    key = '%s.%s' % (document.__module__, document.__name__)
+    key = f'{document.__module__}.{document.__name__}'
     _DOCUMENT_REGISTRY[key] = document
 
 
@@ -78,15 +78,15 @@ def get_document(name):
 
 def validate_string(option, value):
     if not isinstance(value, string_types):
-        raise TypeError('%s must be a string type, not a %s'
-                        % (option, value.__class__.__name__))
+        raise TypeError(
+            f'{option} must be a string type, not a {value.__class__.__name__}'
+        )
+
     return value
 
 
 def validate_string_or_none(option, value):
-    if value is None:
-        return value
-    return validate_string(option, value)
+    return value if value is None else validate_string(option, value)
 
 
 def validate_mongo_field_name(option, value):
@@ -128,41 +128,41 @@ def validate_mongo_keys_in_list(option, lst):
 
 
 def validate_mongo_field_name_or_none(option, value):
-    if value is None:
-        return value
-    return validate_mongo_field_name(option, value)
+    return value if value is None else validate_mongo_field_name(option, value)
 
 
 def validate_boolean(option, value):
     if not isinstance(value, bool):
-        raise TypeError('%s must be a boolean, not a %s'
-                        % (option, value.__class__.__name__))
+        raise TypeError(
+            f'{option} must be a boolean, not a {value.__class__.__name__}'
+        )
+
     return value
 
 
 def validate_boolean_or_none(option, value):
-    if value is None:
-        return value
-    return validate_boolean(option, value)
+    return value if value is None else validate_boolean(option, value)
 
 
 def validate_list_or_tuple(option, value):
     if not isinstance(value, (list, tuple)):
-        raise TypeError('%s must be a list or a tuple, not a %s'
-                        % (option, value.__class__.__name__))
+        raise TypeError(
+            f'{option} must be a list or a tuple, not a {value.__class__.__name__}'
+        )
+
     return value
 
 
 def validate_list_tuple_or_none(option, value):
-    if value is None:
-        return value
-    return validate_list_or_tuple(option, value)
+    return value if value is None else validate_list_or_tuple(option, value)
 
 
 def validate_mapping(option, value):
     if not isinstance(value, abc.Mapping):
-        raise TypeError('%s must be a Mapping, not a %s'
-                        % (option, value.__class__.__name__))
+        raise TypeError(
+            f'{option} must be a Mapping, not a {value.__class__.__name__}'
+        )
+
     return value
 
 

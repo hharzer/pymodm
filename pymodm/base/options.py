@@ -128,7 +128,7 @@ class MongoOptions(object):
         """Callback executed when added to a Model class definition."""
         self.model = cls
         # Name used to look up this class with get_document().
-        self.object_name = '%s.%s' % (cls.__module__, cls.__name__)
+        self.object_name = f'{cls.__module__}.{cls.__name__}'
         setattr(cls, name, self)
 
         # Metadata was defined by user.

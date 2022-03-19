@@ -141,10 +141,9 @@ class FileFieldTestMixin(object):
 
     def test_file_modes(self):
         text_file = open(self.testfile, 'rt')
-        binary_file = open(self.testfile, 'rb')
-        instance = self.model(text_file, binary_file).save()
-        text_file.close()
-        binary_file.close()
+        with open(self.testfile, 'rb') as binary_file:
+            instance = self.model(text_file, binary_file).save()
+            text_file.close()
         upload_content = instance.upload.read()
         self.assertIsInstance(upload_content, bytes)
         self.assertEqual(

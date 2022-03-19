@@ -32,7 +32,7 @@ class ContextManagersTestCase(ODMTestCase):
     @classmethod
     def setUpClass(cls):
         cls.db_name = 'alternate-db'
-        connect(MONGO_URI + '/' + cls.db_name, 'backups')
+        connect(f'{MONGO_URI}/{cls.db_name}', 'backups')
         cls.db = CLIENT[cls.db_name]
 
     @classmethod

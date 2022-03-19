@@ -97,7 +97,7 @@ class BaseManager(object):
 
         """
         if class_name is None:
-            class_name = '%sFrom%s' % (cls.__name__, queryset_class.__name__)
+            class_name = f'{cls.__name__}From{queryset_class.__name__}'
         class_dict = dict(
             cls._get_queryset_methods(queryset_class),
             _queryset_class=queryset_class)

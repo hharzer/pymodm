@@ -157,7 +157,7 @@ def use_setuptools(
 
     try:
         import pkg_resources
-        pkg_resources.require("setuptools>=" + version)
+        pkg_resources.require(f"setuptools>={version}")
         # a suitable version is already installed
         return
     except ImportError:
@@ -337,7 +337,7 @@ def download_setuptools(
     version = _resolve_version(version)
     # making sure we use the absolute path
     to_dir = os.path.abspath(to_dir)
-    zip_name = "setuptools-%s.zip" % version
+    zip_name = f"setuptools-{version}.zip"
     url = download_base + zip_name
     saveto = os.path.join(to_dir, zip_name)
     if not os.path.exists(saveto):  # Avoid repeated downloads

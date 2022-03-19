@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tools for managing connections in MongoModels."""
+
 import sys
 
 from collections import namedtuple
@@ -38,7 +39,7 @@ ConnectionInfo = namedtuple(
 DEFAULT_CONNECTION_ALIAS = 'default'
 
 
-_CONNECTIONS = dict()
+_CONNECTIONS = {}
 
 
 def connect(mongodb_uri, alias=DEFAULT_CONNECTION_ALIAS, **kwargs):

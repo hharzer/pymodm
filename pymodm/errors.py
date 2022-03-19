@@ -76,7 +76,7 @@ class ValidationError(Exception):
         return text_type(self.message)
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, self)
+        return f'{self.__class__.__name__}({self})'
 
 
 class OperationError(Exception):
